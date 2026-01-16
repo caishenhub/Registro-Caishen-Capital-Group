@@ -135,8 +135,9 @@ const App: React.FC = () => {
     autoriza_tratamiento_datos: 'SÍ',
     declara_informacion_veraz: 'SÍ',
     declara_origen_licito: 'SÍ',
-    estado_registro: 'PENDIENTE',
-    notas_internas: 'Registro vía Vercel Node.',
+    autoriza_kyc_biometria: 'SÍ',
+    estado_registro: 'PENDIENTE_KYC',
+    notas_internas: 'Registro vía Vercel Node con Protocolo KYC.',
     firmante_nombre: ''
   });
 
@@ -182,18 +183,18 @@ const App: React.FC = () => {
       <div className="max-w-2xl mx-auto py-12 px-6 text-center animate-fade-in">
         <div className="bg-white p-10 rounded-3xl shadow-xl border-b-8 border-slate-900">
           <div className="w-16 h-16 bg-slate-900 rounded-full flex items-center justify-center mx-auto mb-6">
-            <i className="fas fa-check text-white text-2xl"></i>
+            <i className="fas fa-shield-halved text-white text-2xl"></i>
           </div>
-          <h1 className="text-2xl font-black text-slate-900 mb-2 uppercase tracking-tight">Registro Exitoso</h1>
+          <h1 className="text-2xl font-black text-slate-900 mb-2 uppercase tracking-tight">Registro en Validación</h1>
           <p className="text-slate-500 text-sm mb-10 uppercase tracking-widest font-bold">Caishen Capital Group S.A.S.</p>
           
           <div className="bg-slate-50 p-8 rounded-2xl mb-8 border border-slate-200">
-            <p className="text-[10px] text-slate-400 uppercase font-black mb-1 tracking-widest">Código de Radicado:</p>
+            <p className="text-[10px] text-slate-400 uppercase font-black mb-1 tracking-widest">Código de Radicado KYC:</p>
             <p className="text-2xl font-mono font-bold text-slate-900 tracking-widest">{formData.codigo_registro}</p>
           </div>
           
           <p className="text-slate-600 mb-10 text-sm leading-relaxed max-w-md mx-auto italic">
-            "Su perfil ha sido protocolizado. El equipo de Relaciones con Inversionistas validará su solicitud."
+            "Su perfil y autorizaciones KYC han sido protocolizados exitosamente. Iniciando validación de antecedentes y biometría."
           </p>
 
           <button onClick={() => window.location.reload()} className="w-full bg-slate-900 text-white py-4 rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-black transition-all">
@@ -214,7 +215,7 @@ const App: React.FC = () => {
         <div className="bg-slate-50 px-4 py-2 rounded-lg border border-slate-100">
           <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest text-center">Protocolo de Seguridad</p>
           <p className="text-[11px] text-green-600 font-bold uppercase mt-1 flex items-center justify-center">
-            <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></span> SSL Activo
+            <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></span> KYC Ready
           </p>
         </div>
       </header>
@@ -273,6 +274,38 @@ const App: React.FC = () => {
             <CheckboxField name="declara_informacion_veraz" label="Confirmo que toda la información suministrada es verídica." />
           </div>
 
+          <SectionTitle number="7" title="Validación KYC y Biometría" />
+          <div className="bg-slate-900 p-8 rounded-2xl border border-slate-700 shadow-inner">
+            <div className="flex items-start space-x-4 mb-6 border-b border-slate-800 pb-4">
+              <div className="bg-slate-800 p-3 rounded-xl border border-slate-700 shrink-0">
+                <i className="fas fa-face-viewfinder text-xl text-slate-400"></i>
+              </div>
+              <div>
+                <h3 className="text-white text-sm font-bold uppercase tracking-wider">Protocolo de Identidad Digital</h3>
+                <p className="text-slate-400 text-[11px] leading-relaxed mt-1">
+                  Caishen Capital Group emplea sistemas avanzados de validación biométrica para garantizar la seguridad de sus operaciones y prevenir riesgos de suplantación o fraude.
+                </p>
+              </div>
+            </div>
+            
+            <div className="space-y-3">
+              <label className="flex items-start space-x-3 cursor-pointer group py-2">
+                <div className="flex items-center h-5">
+                  <input 
+                    type="checkbox" 
+                    name="autoriza_kyc_biometria"
+                    defaultChecked={true}
+                    required
+                    className="w-5 h-5 rounded border-slate-600 bg-slate-800 text-white focus:ring-slate-400 cursor-pointer transition-colors" 
+                  />
+                </div>
+                <span className="text-[12px] text-slate-300 leading-tight group-hover:text-white transition-colors select-none">
+                  Autorizo la captura y procesamiento de mis datos biométricos (reconocimiento facial, huella o voz) para la validación de mi identidad. Así mismo, autorizo el cruce de mi información en listas restrictivas nacionales e internacionales (SARLAFT/OFAC/UN) y me comprometo a actualizar mi información periódicamente cuando se requiera, con el fin de mantener los estándares de seguridad y cumplimiento establecidos por Caishen Capital Group y el sector.
+                </span>
+              </label>
+            </div>
+          </div>
+
           <div className="pt-8 flex flex-col items-center border-t border-slate-100">
             <div className="w-full mb-8">
               <InputField label="Firma Electrónica (Nombre Completo)" name="firmante_nombre" value={formData.firmante_nombre} onChange={handleInputChange} placeholder="Escriba su nombre completo para firmar" />
@@ -281,12 +314,12 @@ const App: React.FC = () => {
             <button 
               type="submit" 
               disabled={loading} 
-              className={`w-full md:w-auto min-w-[300px] bg-slate-900 text-white px-12 py-5 rounded-2xl font-black uppercase tracking-[0.2em] text-sm transition-all shadow-xl ${loading ? 'opacity-50 cursor-not-allowed scale-95' : 'hover:bg-black hover:-translate-y-1 active:scale-95'}`}
+              className={`w-full md:w-auto min-w-[320px] bg-slate-900 text-white px-12 py-5 rounded-2xl font-black uppercase tracking-[0.2em] text-sm transition-all shadow-xl ${loading ? 'opacity-50 cursor-not-allowed scale-95' : 'hover:bg-black hover:-translate-y-1 active:scale-95'}`}
             >
-              {loading ? 'Procesando...' : 'Finalizar Registro'}
+              {loading ? 'Validando Identidad...' : 'Protocolizar y Validar KYC'}
             </button>
             <p className="mt-8 text-[9px] text-slate-400 font-bold uppercase tracking-widest text-center max-w-lg leading-relaxed italic">
-              Este registro es informativo y no constituye un contrato de inversión de conformidad con la ley colombiana.
+              Al hacer clic en "Protocolizar", inicia un proceso formal de debida diligencia. Este registro es informativo y no constituye un contrato de inversión.
             </p>
           </div>
         </form>
