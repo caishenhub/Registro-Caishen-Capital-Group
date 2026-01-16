@@ -1,7 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
 
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwyAgrVmcM0bAwJmrzX-X5h7-4TY8Pbz-WV12ArZP1Y3l8b4VRtq5seoSssufJEM9MN3A/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyVL2e0ZQGYIRTa99NaIE5MqyKlsiWZjGcpXNc13mExxzcfKyTwCdKx-xBjdiH4-LPJ_g/exec';
+const LOGO_URL = 'https://i.ibb.co/zT3RhhT9/CAISHEN-NO-FONDO-AZUL-1.png';
+const ACCENT_COLOR = '#ceff04'; // Verde Caishen
+const PRIMARY_BLUE = '#1d1c2d'; // Azul Caishen
 
 const generateUniqueCode = () => {
   const prefix = 'CCG';
@@ -11,11 +14,11 @@ const generateUniqueCode = () => {
 };
 
 const SectionTitle: React.FC<{ number: string; title: string }> = ({ number, title }) => (
-  <div className="flex items-center space-x-3 mb-6 pb-2 border-b border-slate-200 mt-10">
-    <span className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-900 text-white font-bold text-sm shadow-sm shrink-0">
+  <div className="flex items-center space-x-3 mb-6 pb-2 border-b-2 mt-10" style={{ borderColor: PRIMARY_BLUE }}>
+    <span className="flex items-center justify-center w-8 h-8 rounded-full text-white font-bold text-sm shadow-sm shrink-0" style={{ backgroundColor: PRIMARY_BLUE }}>
       {number}
     </span>
-    <h2 className="text-lg md:text-xl font-bold text-slate-800 uppercase tracking-tight">{title}</h2>
+    <h2 className="text-lg md:text-xl font-bold uppercase tracking-tight" style={{ color: PRIMARY_BLUE }}>{title}</h2>
   </div>
 );
 
@@ -29,11 +32,13 @@ const InputField: React.FC<{
   value: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   readOnly?: boolean;
-}> = ({ label, name, placeholder, type = "text", required = true, options, value, onChange, readOnly = false }) => {
+  pattern?: string;
+  inputMode?: "numeric" | "text" | "tel" | "email" | "url" | "decimal" | "search" | "none";
+}> = ({ label, name, placeholder, type = "text", required = true, options, value, onChange, readOnly = false, pattern, inputMode }) => {
   return (
     <div className="flex flex-col space-y-1.5 w-full">
-      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-        {label} {required && !readOnly && <span className="text-red-500">*</span>}
+      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block truncate">
+        {label} {required && !readOnly && <span className="text-red-500 ml-1">*</span>}
       </label>
       {options ? (
         <div className="relative">
@@ -42,7 +47,11 @@ const InputField: React.FC<{
             value={value}
             onChange={onChange}
             required={required}
-            className="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none transition-all appearance-none cursor-pointer text-slate-900 text-base md:text-sm shadow-sm"
+            className="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg outline-none transition-all appearance-none cursor-pointer text-slate-900 text-base md:text-sm shadow-sm focus:ring-2"
+            style={{ 
+              ['--tw-ring-color' as any]: ACCENT_COLOR,
+              borderColor: value ? ACCENT_COLOR : '#cbd5e1' 
+            }}
           >
             <option value="">Seleccione una opción</option>
             {options.map((opt) => (
@@ -62,11 +71,17 @@ const InputField: React.FC<{
           required={required}
           readOnly={readOnly}
           placeholder={placeholder}
-          className={`px-4 py-3 border rounded-lg outline-none transition-all text-base md:text-sm shadow-sm ${
+          pattern={pattern}
+          inputMode={inputMode}
+          className={`px-4 py-3 border rounded-lg outline-none transition-all text-base md:text-sm shadow-sm focus:ring-2 ${
             readOnly 
               ? 'bg-slate-50 border-slate-200 text-slate-400 cursor-not-allowed font-mono' 
-              : 'bg-white border-slate-300 focus:ring-2 focus:ring-slate-900 focus:border-transparent text-slate-900'
+              : 'bg-white border-slate-300 text-slate-900'
           }`}
+          style={!readOnly ? { 
+            ['--tw-ring-color' as any]: ACCENT_COLOR,
+            borderColor: value ? ACCENT_COLOR : '#cbd5e1'
+          } : {}}
         />
       )}
     </div>
@@ -76,15 +91,18 @@ const InputField: React.FC<{
 const CheckboxField: React.FC<{ 
   label: string; 
   name: string;
-}> = ({ label, name }) => (
+  checked: boolean;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}> = ({ label, name, checked, onChange }) => (
   <label className="flex items-start space-x-3 cursor-pointer group py-2">
     <div className="flex items-center h-5">
       <input 
         type="checkbox" 
         name={name}
-        defaultChecked={true}
-        required
-        className="w-5 h-5 rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer transition-colors" 
+        checked={checked}
+        onChange={onChange}
+        className="w-5 h-5 rounded border-slate-300 focus:ring-offset-0 focus:ring-2 cursor-pointer transition-colors" 
+        style={{ color: ACCENT_COLOR, ['--tw-ring-color' as any]: ACCENT_COLOR }}
       />
     </div>
     <span className="text-sm text-slate-600 leading-tight group-hover:text-slate-900 transition-colors select-none">
@@ -106,50 +124,76 @@ const App: React.FC = () => {
       .catch(() => setIp('Protegida (Proxy)'));
   }, []);
 
-  const [formData, setFormData] = useState({
+  const initialState = {
     fecha_registro: new Date().toISOString().split('T')[0],
     codigo_registro: generateUniqueCode(),
     canal_ingreso: '',
-    canal_otro: 'N/A',
     asesor_asignado: '',
     nombre_completo: '',
     tipo_documento: '',
     numero_documento: '',
+    fecha_expedicion: '',
     fecha_nacimiento: '',
-    nacionalidad: '',
+    nacionalidad: 'Colombiana',
     email: '',
     telefono: '',
     direccion: '',
     ciudad: '',
-    pais: '',
+    pais: 'Colombia',
     actividad_economica: '',
     nivel_ingresos: '',
     origen_fondos: '',
-    origen_fondos_otro: 'N/A',
     experiencia_inversion: '',
     objetivo_inversion: '',
     horizonte_inversion: '',
     tolerancia_riesgo: '',
-    acepta_terminos: 'SÍ',
-    acepta_riesgos: 'SÍ',
-    autoriza_tratamiento_datos: 'SÍ',
-    declara_informacion_veraz: 'SÍ',
-    declara_origen_licito: 'SÍ',
-    autoriza_kyc_biometria: 'SÍ',
-    estado_registro: 'PENDIENTE_KYC',
-    notas_internas: 'Registro vía Vercel Node con Protocolo KYC.',
+    autoriza_tratamiento_datos: false,
+    declara_origen_licito: false,
+    declara_informacion_veraz: false,
+    autoriza_kyc_biometria: false,
     firmante_nombre: ''
-  });
+  };
+
+  const [formData, setFormData] = useState(initialState);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const { name, value, type } = e.target;
+    if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked;
+      setFormData(prev => ({ ...prev, [name]: checked }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleReset = () => {
+    setFormData({
+      ...initialState,
+      codigo_registro: generateUniqueCode()
+    });
+    setSubmitted(false);
+    setError(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const isFormValid = () => {
+    return (
+      formData.autoriza_tratamiento_datos &&
+      formData.declara_origen_licito &&
+      formData.declara_informacion_veraz &&
+      formData.autoriza_kyc_biometria
+    );
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (loading) return;
     
+    if (!isFormValid()) {
+      setError("Debe autorizar todas las declaraciones legales y el protocolo KYC para continuar.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -166,14 +210,12 @@ const App: React.FC = () => {
         }),
       });
 
-      setTimeout(() => {
-        setSubmitted(true);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        setLoading(false);
-      }, 1000);
-
+      setSubmitted(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err: any) {
-      setError("Error de comunicación. Por favor intente nuevamente.");
+      console.error("Submit error:", err);
+      setError("Error de comunicación. Intente nuevamente.");
+    } finally {
       setLoading(false);
     }
   };
@@ -181,24 +223,32 @@ const App: React.FC = () => {
   if (submitted) {
     return (
       <div className="max-w-2xl mx-auto py-12 px-6 text-center animate-fade-in">
-        <div className="bg-white p-10 rounded-3xl shadow-xl border-b-8 border-slate-900">
-          <div className="w-16 h-16 bg-slate-900 rounded-full flex items-center justify-center mx-auto mb-6">
-            <i className="fas fa-shield-halved text-white text-2xl"></i>
+        <div className="bg-white p-10 rounded-3xl shadow-xl border-b-8" style={{ borderBottomColor: PRIMARY_BLUE }}>
+          <div className="mb-8 flex justify-center">
+            <img src={LOGO_URL} alt="Caishen Capital Group Logo" className="h-20 object-contain" />
           </div>
-          <h1 className="text-2xl font-black text-slate-900 mb-2 uppercase tracking-tight">Registro en Validación</h1>
-          <p className="text-slate-500 text-sm mb-10 uppercase tracking-widest font-bold">Caishen Capital Group S.A.S.</p>
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 shadow-md" style={{ backgroundColor: ACCENT_COLOR }}>
+            <i className="fas fa-check text-slate-900 text-2xl"></i>
+          </div>
+          <h1 className="text-2xl font-black mb-2 uppercase tracking-tight" style={{ color: PRIMARY_BLUE }}>Registro Recibido</h1>
+          <p className="text-slate-500 text-sm mb-10 uppercase tracking-widest font-bold">Oficialía de Cumplimiento</p>
           
           <div className="bg-slate-50 p-8 rounded-2xl mb-8 border border-slate-200">
-            <p className="text-[10px] text-slate-400 uppercase font-black mb-1 tracking-widest">Código de Radicado KYC:</p>
-            <p className="text-2xl font-mono font-bold text-slate-900 tracking-widest">{formData.codigo_registro}</p>
+            <p className="text-[10px] text-slate-400 uppercase font-black mb-1 tracking-widest">ID Único de Radicado:</p>
+            <p className="text-2xl font-mono font-bold tracking-widest" style={{ color: PRIMARY_BLUE }}>{formData.codigo_registro}</p>
           </div>
           
           <p className="text-slate-600 mb-10 text-sm leading-relaxed max-w-md mx-auto italic">
-            "Su perfil y autorizaciones KYC han sido protocolizados exitosamente. Iniciando validación de antecedentes y biometría."
+            "Su perfil institucional ha sido protocolizado. El departamento de cumplimiento iniciará el análisis de vinculación societaria."
           </p>
 
-          <button onClick={() => window.location.reload()} className="w-full bg-slate-900 text-white py-4 rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-black transition-all">
-            Nuevo Registro
+          <button 
+            type="button"
+            onClick={handleReset} 
+            className="w-full text-white py-4 rounded-xl font-bold uppercase tracking-widest text-xs hover:opacity-90 transition-all shadow-lg active:scale-95"
+            style={{ backgroundColor: PRIMARY_BLUE }}
+          >
+            Realizar Nuevo Registro
           </button>
         </div>
       </div>
@@ -207,16 +257,20 @@ const App: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto py-8 md:py-12 px-4 animate-fade-in">
-      <header className="bg-white p-6 md:p-10 rounded-t-3xl shadow-sm border-b border-slate-100 flex flex-col md:flex-row justify-between items-center text-center md:text-left gap-6">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">Caishen Capital Group</h1>
-          <p className="text-[10px] font-bold text-slate-400 tracking-[0.3em] uppercase mt-3">S.A.S. | Protocolo Onboarding Digital</p>
+      <header className="bg-white p-6 md:p-8 rounded-t-3xl shadow-sm border-b-4 flex flex-col md:flex-row justify-between items-center text-center md:text-left gap-4 md:gap-0" style={{ borderBottomColor: PRIMARY_BLUE }}>
+        <div className="flex flex-col items-center md:items-start space-y-2">
+          <img src={LOGO_URL} alt="Caishen Capital Group Logo" className="h-12 md:h-14 object-contain" />
+          <p className="text-[10px] font-bold text-slate-400 tracking-[0.25em] uppercase pl-1">Protocolo Onboarding Digital</p>
         </div>
-        <div className="bg-slate-50 px-4 py-2 rounded-lg border border-slate-100">
-          <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest text-center">Protocolo de Seguridad</p>
-          <p className="text-[11px] text-green-600 font-bold uppercase mt-1 flex items-center justify-center">
-            <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></span> KYC Ready
-          </p>
+        
+        <div className="flex items-center space-x-3 bg-slate-50 px-5 py-3 rounded-2xl border border-slate-100 shadow-sm">
+          <div className="flex flex-col items-center md:items-end">
+            <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Estatus Normativo</p>
+            <div className="flex items-center mt-1">
+              <i className="fas fa-fingerprint text-[10px] mr-2" style={{ color: ACCENT_COLOR }}></i>
+              <span className="text-[10px] md:text-[11px] font-extrabold uppercase tracking-wider text-slate-600">KYC Protocol</span>
+            </div>
+          </div>
         </div>
       </header>
 
@@ -236,97 +290,116 @@ const App: React.FC = () => {
           </div>
 
           <SectionTitle number="2" title="Identificación del Titular" />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="md:col-span-2">
-              <InputField label="Nombre Completo" name="nombre_completo" value={formData.nombre_completo} onChange={handleInputChange} placeholder="Nombres y Apellidos" />
-            </div>
-            <InputField label="Tipo Documento" name="tipo_documento" options={["CC", "CE", "PPT", "NIT"]} value={formData.tipo_documento} onChange={handleInputChange} />
-            <InputField label="Número" name="numero_documento" value={formData.numero_documento} onChange={handleInputChange} />
-          </div>
-
-          <SectionTitle number="3" title="Localización" />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <InputField label="Email" name="email" type="email" value={formData.email} onChange={handleInputChange} />
-            <InputField label="Celular" name="telefono" value={formData.telefono} onChange={handleInputChange} />
-            <div className="md:col-span-2">
-              <InputField label="Dirección" name="direccion" value={formData.direccion} onChange={handleInputChange} />
+          <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6 rounded-r-lg">
+            <div className="flex items-center">
+              <i className="fas fa-info-circle text-blue-500 mr-3"></i>
+              <p className="text-xs font-bold text-blue-800 uppercase tracking-tight">
+                Importante: Verifique que sus nombres y documento coincidan exactamente con su identificación legal. Esta información será cruzada en listas restrictivas.
+              </p>
             </div>
           </div>
-
-          <SectionTitle number="4" title="Actividad Económica" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <InputField label="Ocupación" name="actividad_economica" options={["Empleado", "Empresario", "Independiente", "Pensionado", "Rentista"]} value={formData.actividad_economica} onChange={handleInputChange} />
-            <InputField label="Fuente de Fondos" name="origen_fondos" options={["Ahorros", "Salario", "Venta de Activos", "Otro"]} value={formData.origen_fondos} onChange={handleInputChange} />
+            <div className="md:col-span-2">
+              <InputField label="Nombre Completo" name="nombre_completo" value={formData.nombre_completo} onChange={handleInputChange} placeholder="Nombres y Apellidos según documento" />
+            </div>
+            <InputField label="Tipo de Documento" name="tipo_documento" options={["Cédula de Ciudadanía", "Cédula de Extranjería", "Pasaporte", "Número de Identificación Tributaria (NIT)"]} value={formData.tipo_documento} onChange={handleInputChange} />
+            <InputField label="Número de Documento" name="numero_documento" type="text" pattern="[0-9]*" inputMode="numeric" value={formData.numero_documento} onChange={handleInputChange} placeholder="Solo números" />
+            <InputField label="Fecha Expedición" name="fecha_expedicion" type="date" value={formData.fecha_expedicion} onChange={handleInputChange} />
+            <InputField label="Fecha Nacimiento" name="fecha_nacimiento" type="date" value={formData.fecha_nacimiento} onChange={handleInputChange} />
+            <InputField label="Nacionalidad" name="nacionalidad" value={formData.nacionalidad} onChange={handleInputChange} placeholder="Ej: Colombiana" />
           </div>
 
-          <SectionTitle number="5" title="Perfil de Riesgo" />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <InputField label="Experiencia" name="experiencia_inversion" options={["Nula", "Media", "Alta"]} value={formData.experiencia_inversion} onChange={handleInputChange} />
-            <InputField label="Riesgo" name="tolerancia_riesgo" options={["Bajo", "Medio", "Alto"]} value={formData.tolerancia_riesgo} onChange={handleInputChange} />
-            <InputField label="Plazo" name="horizonte_inversion" options={["Corto", "Largo"]} value={formData.horizonte_inversion} onChange={handleInputChange} />
-            <InputField label="Objetivo" name="objetivo_inversion" options={["Renta", "Crecimiento"]} value={formData.objetivo_inversion} onChange={handleInputChange} />
+          <SectionTitle number="3" title="Localización y Contacto" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <InputField label="Email Institucional / Personal" name="email" type="email" value={formData.email} onChange={handleInputChange} />
+            <InputField label="Teléfono Celular" name="telefono" value={formData.telefono} onChange={handleInputChange} />
+            <div className="md:col-span-2">
+              <InputField label="Dirección de Residencia" name="direccion" value={formData.direccion} onChange={handleInputChange} />
+            </div>
+            <InputField label="Ciudad" name="ciudad" value={formData.ciudad} onChange={handleInputChange} />
+            <InputField label="País" name="pais" value={formData.pais} onChange={handleInputChange} />
+          </div>
+
+          <SectionTitle number="4" title="Información Financiera (USD)" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <InputField label="Actividad Económica" name="actividad_economica" options={["Directivo / Gerente", "Dueño de Empresa", "Consultor Senior", "Inversionista Profesional", "Otros"]} value={formData.actividad_economica} onChange={handleInputChange} />
+            <InputField label="Ingresos Mensuales Aproximados (USD)" name="nivel_ingresos" options={["0 - 1.000 USD", "1.001 - 5.000 USD", "5.001 - 10.000 USD", "10.001 - 25.000 USD", "Más de 25.000 USD"]} value={formData.nivel_ingresos} onChange={handleInputChange} />
+            <InputField label="Origen de los Fondos" name="origen_fondos" options={["Utilidades Operativas", "Ahorros Patrimoniales", "Venta de Activos Reales", "Liquidación de Dividendos"]} value={formData.origen_fondos} onChange={handleInputChange} />
+            <InputField label="Experiencia en Mercados" name="experiencia_inversion" options={["Sin experiencia", "Básica", "Intermedia", "Experto / Institucional"]} value={formData.experiencia_inversion} onChange={handleInputChange} />
+          </div>
+
+          <SectionTitle number="5" title="Perfil de Socio Potencial" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <InputField label="Tolerancia al Riesgo" name="tolerancia_riesgo" options={["Bajo / Conservador", "Medio / Moderado", "Alto / Agresivo"]} value={formData.tolerancia_riesgo} onChange={handleInputChange} />
+            <InputField label="Horizonte de Tiempo" name="horizonte_inversion" options={["Corto Plazo", "Mediano Plazo", "Largo Plazo"]} value={formData.horizonte_inversion} onChange={handleInputChange} />
+            <InputField label="Objetivo de Asociación" name="objetivo_inversion" options={["Expansión de Capital Corporativo", "Participación en Equity", "Crecimiento Patrimonial", "Diversificación de Negocios"]} value={formData.objetivo_inversion} onChange={handleInputChange} />
           </div>
 
           <SectionTitle number="6" title="Cumplimiento Legal" />
-          <div className="space-y-2 bg-slate-50 p-6 rounded-2xl border border-slate-200">
-            <CheckboxField name="autoriza_tratamiento_datos" label="Autorizo tratamiento de datos personales (Ley 1581 de 2012)." />
-            <CheckboxField name="declara_origen_licito" label="Certifico el origen lícito de mis fondos bajo gravedad de juramento." />
-            <CheckboxField name="declara_informacion_veraz" label="Confirmo que toda la información suministrada es verídica." />
+          <div className="space-y-2 bg-slate-50 p-6 rounded-2xl border border-slate-200 shadow-inner">
+            <CheckboxField name="autoriza_tratamiento_datos" checked={formData.autoriza_tratamiento_datos} onChange={handleInputChange} label="Autorizo tratamiento de datos personales conforme a la Ley 1581 de 2012." />
+            <CheckboxField name="declara_origen_licito" checked={formData.declara_origen_licito} onChange={handleInputChange} label="Certifico el origen lícito de mis fondos bajo la gravedad de juramento." />
+            <CheckboxField name="declara_informacion_veraz" checked={formData.declara_informacion_veraz} onChange={handleInputChange} label="Confirmo que toda la información suministrada es verídica y verificable." />
           </div>
 
           <SectionTitle number="7" title="Validación KYC y Biometría" />
-          <div className="bg-slate-900 p-8 rounded-2xl border border-slate-700 shadow-inner">
-            <div className="flex items-start space-x-4 mb-6 border-b border-slate-800 pb-4">
-              <div className="bg-slate-800 p-3 rounded-xl border border-slate-700 shrink-0">
-                <i className="fas fa-face-viewfinder text-xl text-slate-400"></i>
-              </div>
-              <div>
-                <h3 className="text-white text-sm font-bold uppercase tracking-wider">Protocolo de Identidad Digital</h3>
-                <p className="text-slate-400 text-[11px] leading-relaxed mt-1">
-                  Caishen Capital Group emplea sistemas avanzados de validación biométrica para garantizar la seguridad de sus operaciones y prevenir riesgos de suplantación o fraude.
-                </p>
-              </div>
+          <div className="p-8 rounded-2xl border border-slate-700 shadow-inner" style={{ backgroundColor: PRIMARY_BLUE }}>
+            <div className="mb-6 border-b border-slate-700 pb-4">
+              <h3 className="text-white text-sm font-bold uppercase tracking-wider">Protocolo de Identidad Digital</h3>
+              <p className="text-slate-400 text-[11px] leading-relaxed mt-1">
+                Caishen Capital Group emplea sistemas avanzados de validación biométrica para garantizar la seguridad de sus operaciones y prevenir riesgos de suplantación o fraude societario.
+              </p>
             </div>
             
             <div className="space-y-3">
-              <label className="flex items-start space-x-3 cursor-pointer group py-2">
-                <div className="flex items-center h-5">
+              <label className="flex items-start space-x-4 cursor-pointer group py-2">
+                <div className="flex items-center h-6">
                   <input 
                     type="checkbox" 
                     name="autoriza_kyc_biometria"
-                    defaultChecked={true}
-                    required
-                    className="w-5 h-5 rounded border-slate-600 bg-slate-800 text-white focus:ring-slate-400 cursor-pointer transition-colors" 
+                    checked={formData.autoriza_kyc_biometria}
+                    onChange={handleInputChange}
+                    className="w-5 h-5 rounded border-slate-600 bg-slate-800 focus:ring-offset-0 focus:ring-2 cursor-pointer transition-colors"
+                    style={{ color: ACCENT_COLOR, ['--tw-ring-color' as any]: ACCENT_COLOR }}
                   />
                 </div>
                 <span className="text-[12px] text-slate-300 leading-tight group-hover:text-white transition-colors select-none">
-                  Autorizo la captura y procesamiento de mis datos biométricos (reconocimiento facial, huella o voz) para la validación de mi identidad. Así mismo, autorizo el cruce de mi información en listas restrictivas nacionales e internacionales (SARLAFT/OFAC/UN) y me comprometo a actualizar mi información periódicamente cuando se requiera, con el fin de mantener los estándares de seguridad y cumplimiento establecidos por Caishen Capital Group y el sector.
+                  Acepto el protocolo de validación KYC y autorizo el cruce de mis datos en centrales de riesgo y listas restrictivas internacionales (OFAC, ONU, etc.).
                 </span>
               </label>
             </div>
           </div>
 
-          <div className="pt-8 flex flex-col items-center border-t border-slate-100">
+          <div className="pt-8 flex flex-col items-center border-t-2" style={{ borderColor: PRIMARY_BLUE }}>
             <div className="w-full mb-8">
-              <InputField label="Firma Electrónica (Nombre Completo)" name="firmante_nombre" value={formData.firmante_nombre} onChange={handleInputChange} placeholder="Escriba su nombre completo para firmar" />
+              <InputField label="Firma de Aceptación (Escriba su Nombre Completo)" name="firmante_nombre" value={formData.firmante_nombre} onChange={handleInputChange} placeholder="Firma electrónica institucional" />
             </div>
             
             <button 
               type="submit" 
-              disabled={loading} 
-              className={`w-full md:w-auto min-w-[320px] bg-slate-900 text-white px-12 py-5 rounded-2xl font-black uppercase tracking-[0.2em] text-sm transition-all shadow-xl ${loading ? 'opacity-50 cursor-not-allowed scale-95' : 'hover:bg-black hover:-translate-y-1 active:scale-95'}`}
+              disabled={loading || !isFormValid()} 
+              className={`w-full md:w-auto min-w-[320px] text-slate-900 px-12 py-5 rounded-2xl font-black uppercase tracking-[0.2em] text-sm transition-all shadow-xl ${loading || !isFormValid() ? 'opacity-30 cursor-not-allowed grayscale' : 'hover:-translate-y-1 active:scale-95 cursor-pointer'}`}
+              style={{ backgroundColor: ACCENT_COLOR }}
             >
-              {loading ? 'Validando Identidad...' : 'Protocolizar y Validar KYC'}
+              {loading ? 'Validando Credenciales...' : 'Protocolizar Onboarding'}
             </button>
+            {!isFormValid() && (
+              <p className="mt-4 text-[10px] text-red-500 font-bold uppercase tracking-widest text-center">
+                * Debe completar las autorizaciones de las secciones 6 y 7 para habilitar el envío.
+              </p>
+            )}
             <p className="mt-8 text-[9px] text-slate-400 font-bold uppercase tracking-widest text-center max-w-lg leading-relaxed italic">
-              Al hacer clic en "Protocolizar", inicia un proceso formal de debida diligencia. Este registro es informativo y no constituye un contrato de inversión.
+              Este formulario no constituye oferta pública ni contrato de inversión. Es un protocolo de debida diligencia privado.
             </p>
           </div>
         </form>
       </main>
 
-      <footer className="text-[10px] text-slate-400 text-center uppercase pb-12 tracking-[0.3em] space-y-2">
-        <p>© 2024 CAISHEN CAPITAL GROUP S.A.S. | OFICIALÍA DE CUMPLIMIENTO</p>
+      <footer className="text-[10px] text-slate-400 text-center uppercase pb-12 tracking-[0.3em] space-y-6">
+        <div className="flex justify-center opacity-60 hover:opacity-100 transition-opacity duration-500">
+           <img src={LOGO_URL} alt="Footer Logo" className="h-10 object-contain grayscale" />
+        </div>
+        <p className="font-bold">© 2026 CAISHEN CAPITAL GROUP S.A.S. | OFICIALÍA DE CUMPLIMIENTO</p>
       </footer>
     </div>
   );
