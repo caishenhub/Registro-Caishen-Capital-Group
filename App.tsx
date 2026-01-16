@@ -263,12 +263,18 @@ const App: React.FC = () => {
           <p className="text-[10px] font-bold text-slate-400 tracking-[0.25em] uppercase pl-1">Protocolo Onboarding Digital</p>
         </div>
         
-        <div className="flex items-center space-x-3 bg-slate-50 px-5 py-3 rounded-2xl border border-slate-100 shadow-sm">
+        <div className="flex items-center space-x-4 bg-slate-50/50 px-6 py-4 rounded-3xl border border-slate-100 shadow-sm transition-all hover:shadow-md">
           <div className="flex flex-col items-center md:items-end">
-            <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Estatus Normativo</p>
-            <div className="flex items-center mt-1">
-              <i className="fas fa-fingerprint text-[10px] mr-2" style={{ color: ACCENT_COLOR }}></i>
-              <span className="text-[10px] md:text-[11px] font-extrabold uppercase tracking-wider text-slate-600">KYC Protocol</span>
+            <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1.5">Estatus Normativo</p>
+            <div className="flex items-center bg-white px-3 py-1.5 rounded-full border border-slate-100 shadow-inner">
+              <div className="relative mr-2.5">
+                 <i className="fas fa-fingerprint text-[14px] leading-none" style={{ color: ACCENT_COLOR }}></i>
+                 <span className="absolute -top-1 -right-1 flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ backgroundColor: ACCENT_COLOR }}></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: ACCENT_COLOR }}></span>
+                 </span>
+              </div>
+              <span className="text-[12px] font-extrabold uppercase tracking-widest" style={{ color: PRIMARY_BLUE }}>KYC PROTOCOL</span>
             </div>
           </div>
         </div>
