@@ -112,6 +112,7 @@ const CheckboxField: React.FC<{
 );
 
 const App: React.FC = () => {
+  const [showIntro, setShowIntro] = useState(true);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -173,6 +174,7 @@ const App: React.FC = () => {
     });
     setSubmitted(false);
     setError(null);
+    setShowIntro(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -219,6 +221,53 @@ const App: React.FC = () => {
       setLoading(false);
     }
   };
+
+  if (showIntro) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-slate-50/80 backdrop-blur-md animate-fade-in">
+        <div className="max-w-2xl w-full bg-white rounded-[2.5rem] shadow-[0_40px_80px_-15px_rgba(0,0,0,0.1)] overflow-hidden border border-slate-100">
+          <div className="p-10 md:p-16 text-center">
+            <div className="mb-12 flex justify-center">
+              <img src={LOGO_URL} alt="Caishen Capital Group Logo" className="h-14 object-contain" />
+            </div>
+            <h1 className="text-2xl md:text-3xl font-black mb-6 uppercase tracking-tight" style={{ color: PRIMARY_BLUE }}>
+              BIENVENIDO A CAISHEN CAPITAL GROUP
+            </h1>
+            <p className="text-slate-500 text-sm md:text-base mb-12 leading-relaxed font-medium px-4">
+              Está a punto de iniciar el pre-registro de accionistas, un proceso informativo y de verificación inicial que nos permite conocer su perfil antes de cualquier vinculación formal.
+              <br/><br/>
+              Este procedimiento se realiza bajo criterios de debida diligencia y protección de la información, conforme a estándares de cumplimiento aplicables.
+            </p>
+            <div className="flex flex-col space-y-6">
+              <button 
+                onClick={() => setShowIntro(false)}
+                className="w-full text-slate-900 py-5 rounded-2xl font-black uppercase tracking-[0.2em] text-[11px] transition-all shadow-lg active:scale-95"
+                style={{ backgroundColor: ACCENT_COLOR }}
+              >
+                INICIAR PRE-REGISTRO
+              </button>
+              
+              <div className="flex justify-center items-center space-x-6">
+                <div className="flex items-center text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
+                  <i className="fas fa-shield-alt mr-2" style={{ color: PRIMARY_BLUE }}></i> Seguro
+                </div>
+                <div className="flex items-center text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
+                  <i className="fas fa-lock mr-2" style={{ color: PRIMARY_BLUE }}></i> Encriptado
+                </div>
+                <div className="flex items-center text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
+                  <i className="fas fa-user-check mr-2" style={{ color: PRIMARY_BLUE }}></i> Verificado
+                </div>
+              </div>
+              
+              <p className="text-[9px] text-slate-300 font-bold uppercase tracking-widest mt-4">
+                Protección de datos conforme a la normativa aplicable
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (submitted) {
     return (
