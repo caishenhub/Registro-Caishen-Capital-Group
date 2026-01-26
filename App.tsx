@@ -1,9 +1,9 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 /**
- * CAISHEN CAPITAL GROUP - ONBOARDING INSTITUCIONAL v3.9
- * Restauración de mensaje funcional y mantenimiento de estética premium.
+ * CAISHEN CAPITAL GROUP - ONBOARDING INSTITUCIONAL v4.0
+ * Integración de Signature Pad para UX sin almacenamiento de imagen.
  */
 
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx9eYMH85av1PTxYuFgJOPvdVeu11aMelYXgxw7VIANAfYFobZqGuIV0xeAdUa3VXACMQ/exec';
@@ -111,6 +111,108 @@ const CheckboxCard: React.FC<{
     </div>
   </label>
 );
+
+const SignaturePad: React.FC = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [hasDrawn, setHasDrawn] = useState(false);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Ajuste de resolución para nitidez
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * 2;
+    canvas.height = rect.height * 2;
+    ctx.scale(2, 2);
+    
+    ctx.strokeStyle = '#1d1c2d';
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+  }, []);
+
+  const startDrawing = (e: React.MouseEvent | React.TouchEvent) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = ('touches' in e ? e.touches[0].clientX : e.clientX) - rect.left;
+    const y = ('touches' in e ? e.touches[0].clientY : e.clientY) - rect.top;
+
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    setIsDrawing(true);
+    setHasDrawn(true);
+  };
+
+  const draw = (e: React.MouseEvent | React.TouchEvent) => {
+    if (!isDrawing) return;
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    if (!canvas || !ctx) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = ('touches' in e ? e.touches[0].clientX : e.clientX) - rect.left;
+    const y = ('touches' in e ? e.touches[0].clientY : e.clientY) - rect.top;
+
+    ctx.lineTo(x, y);
+    ctx.stroke();
+  };
+
+  const stopDrawing = () => setIsDrawing(false);
+
+  const clearCanvas = () => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    if (!canvas || !ctx) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    setHasDrawn(false);
+  };
+
+  return (
+    <div className="flex flex-col space-y-3 w-full">
+      <div className="relative group">
+        <div className="absolute -inset-1 bg-gradient-to-r from-slate-200 to-slate-100 rounded-[2rem] blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+        <div className="relative bg-white border-2 border-slate-100 rounded-[1.8rem] overflow-hidden shadow-inner h-40 cursor-crosshair">
+          <canvas
+            ref={canvasRef}
+            onMouseDown={startDrawing}
+            onMouseMove={draw}
+            onMouseUp={stopDrawing}
+            onMouseLeave={stopDrawing}
+            onTouchStart={startDrawing}
+            onTouchMove={draw}
+            onTouchEnd={stopDrawing}
+            className="w-full h-full touch-none"
+          />
+          {!hasDrawn && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none opacity-20">
+              <i className="fas fa-signature text-4xl mb-2 text-slate-400"></i>
+              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-500">Dibuje su firma aquí</p>
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={clearCanvas}
+            className="absolute bottom-4 right-4 bg-slate-100 hover:bg-slate-200 text-slate-500 p-2 rounded-full transition-colors"
+            title="Borrar firma"
+          >
+            <i className="fas fa-redo-alt text-[10px]"></i>
+          </button>
+        </div>
+      </div>
+      <p className="text-[7px] font-bold text-slate-400 uppercase tracking-widest text-center">
+        <i className="fas fa-info-circle mr-1"></i> El trazo manuscrito es para validación de experiencia de usuario.
+      </p>
+    </div>
+  );
+};
 
 const App: React.FC = () => {
   const [showIntro, setShowIntro] = useState(true);
@@ -417,31 +519,51 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            <div className="mt-16 space-y-8">
-              <div className="border-t border-slate-100 pt-10">
-                <InputField label="Firma Electrónica (Nombre Completo)" name="firmante_nombre" value={formData.firmante_nombre} onChange={handleInputChange} placeholder="Escriba su nombre completo para firmar" highlight />
+            <SectionHeader number="8" title="Formalización de la Firma" />
+            <div className="space-y-8 bg-slate-50 p-8 rounded-[2.5rem] border border-slate-100 shadow-inner">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
+                <div className="space-y-6">
+                  <InputField 
+                    label="Firma: Nombre Completo del Titular" 
+                    name="firmante_nombre" 
+                    value={formData.firmante_nombre} 
+                    onChange={handleInputChange} 
+                    placeholder="Escriba su nombre completo para firmar" 
+                    highlight 
+                  />
+                  <div className="p-5 bg-white rounded-2xl border border-slate-200">
+                    <p className="text-[9px] text-slate-500 leading-relaxed font-medium">
+                      Esta firma electrónica simple asocia su identidad con la dirección IP actual desde donde está realizando este registro y el código de seguridad <span className="font-bold text-slate-900">{formData.codigo_registro}</span>. La veracidad de estos datos es responsabilidad exclusiva del firmante.
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex flex-col space-y-3">
+                  <label className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Trazo Digital Manuscrito Requerido</label>
+                  <SignaturePad />
+                </div>
               </div>
               
-              <div className="flex flex-col items-center">
+              <div className="flex flex-col items-center pt-6">
                 <button 
                   type="submit" 
                   disabled={loading || !isFormValid()}
-                  className={`w-full py-5 rounded-2xl font-black uppercase tracking-[0.4em] text-[12px] transition-all ${
+                  className={`w-full py-6 rounded-2xl font-black uppercase tracking-[0.4em] text-[12px] transition-all ${
                     !isFormValid() 
-                      ? 'bg-slate-100 text-slate-300 cursor-not-allowed' 
+                      ? 'bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-300 shadow-none' 
                       : 'bg-slate-900 text-white hover:bg-black shadow-[0_20px_40px_-10px_rgba(0,0,0,0.3)] active:scale-[0.98]'
                   }`}
                 >
                   {loading ? (
                     <span className="flex items-center justify-center">
-                      <i className="fas fa-circle-notch animate-spin mr-3"></i> ENCRIPTANDO DATOS...
+                      <i className="fas fa-sync-alt animate-spin mr-3"></i> PROTOCOLIZANDO...
                     </span>
                   ) : 'PROTOCOLIZAR PRE-REGISTRO'}
                 </button>
-                {error && <p className="mt-4 text-[9px] text-red-600 font-bold uppercase">{error}</p>}
+                {error && <p className="mt-4 text-[9px] text-red-600 font-bold uppercase tracking-widest">{error}</p>}
                 {!isFormValid() && !loading && (
                    <p className="mt-4 text-[8px] text-slate-400 font-bold uppercase tracking-widest flex items-center">
-                     <i className="fas fa-lock mr-2"></i> Verifique los consentimientos legales para continuar
+                     <i className="fas fa-shield-alt mr-2 text-amber-500"></i> Complete todos los campos, consentimientos y nombre de firma
                    </p>
                 )}
               </div>
