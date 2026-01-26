@@ -2,8 +2,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 /**
- * CAISHEN CAPITAL GROUP - ONBOARDING INSTITUCIONAL v4.0
- * Integración de Signature Pad para UX sin almacenamiento de imagen.
+ * CAISHEN CAPITAL GROUP - ONBOARDING INSTITUCIONAL v4.2
+ * Corrección de correlación de coordenadas y escala en Signature Pad.
  */
 
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx9eYMH85av1PTxYuFgJOPvdVeu11aMelYXgxw7VIANAfYFobZqGuIV0xeAdUa3VXACMQ/exec';
@@ -114,8 +114,8 @@ const CheckboxCard: React.FC<{
 
 const SignaturePad: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isDrawing, setIsDrawing] = useState(false);
   const [hasDrawn, setHasDrawn] = useState(false);
+  const isDrawing = useRef(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -123,110 +123,114 @@ const SignaturePad: React.FC = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Ajuste de resolución para nitidez
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * 2;
-    canvas.height = rect.height * 2;
-    ctx.scale(2, 2);
-    
-    ctx.strokeStyle = '#1d1c2d';
-    ctx.lineWidth = 2.5;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-  }, []);
-
-  const getCoordinates = (e: React.MouseEvent | React.TouchEvent) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return { x: 0, y: 0 };
-    const rect = canvas.getBoundingClientRect();
-    
-    let clientX, clientY;
-    if ('touches' in e && e.touches.length > 0) {
-      clientX = e.touches[0].clientX;
-      clientY = e.touches[0].clientY;
-    } else {
-      const mouseEvent = e as React.MouseEvent;
-      clientX = mouseEvent.clientX;
-      clientY = mouseEvent.clientY;
-    }
-
-    return {
-      x: clientX - rect.left,
-      y: clientY - rect.top
+    const setupCanvas = () => {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      
+      // Ajustar dimensiones internas del canvas
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      
+      // Escalar el contexto para que 1 unidad de dibujo = 1 pixel CSS
+      ctx.scale(dpr, dpr);
+      
+      // Restablecer estilos después del cambio de tamaño
+      ctx.strokeStyle = '#1d1c2d';
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
     };
-  };
 
-  const startDrawing = (e: React.MouseEvent | React.TouchEvent) => {
-    // Evitar scroll en móvil mientras se firma
-    if (e.cancelable) e.preventDefault();
+    setupCanvas();
+    window.addEventListener('resize', setupCanvas);
+
+    const getPos = (e: MouseEvent | TouchEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      let clientX, clientY;
+      
+      if ('touches' in e) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      } else {
+        clientX = (e as MouseEvent).clientX;
+        clientY = (e as MouseEvent).clientY;
+      }
+      
+      return {
+        x: clientX - rect.left,
+        y: clientY - rect.top
+      };
+    };
+
+    const handleStart = (e: MouseEvent | TouchEvent) => {
+      if (e.cancelable) e.preventDefault();
+      isDrawing.current = true;
+      setHasDrawn(true);
+      const { x, y } = getPos(e);
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+    };
+
+    const handleMove = (e: MouseEvent | TouchEvent) => {
+      if (!isDrawing.current) return;
+      if (e.cancelable) e.preventDefault();
+      const { x, y } = getPos(e);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    };
+
+    const handleEnd = () => {
+      isDrawing.current = false;
+    };
+
+    canvas.addEventListener('mousedown', handleStart);
+    canvas.addEventListener('mousemove', handleMove);
+    window.addEventListener('mouseup', handleEnd);
     
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    canvas.addEventListener('touchstart', handleStart, { passive: false });
+    canvas.addEventListener('touchmove', handleMove, { passive: false });
+    canvas.addEventListener('touchend', handleEnd);
 
-    const { x, y } = getCoordinates(e);
-
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    setIsDrawing(true);
-    setHasDrawn(true);
-  };
-
-  const draw = (e: React.MouseEvent | React.TouchEvent) => {
-    if (!isDrawing) return;
-    // Evitar scroll en móvil mientras se firma
-    if (e.cancelable) e.preventDefault();
-
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext('2d');
-    if (!canvas || !ctx) return;
-
-    const { x, y } = getCoordinates(e);
-
-    ctx.lineTo(x, y);
-    ctx.stroke();
-  };
-
-  const stopDrawing = (e: React.MouseEvent | React.TouchEvent) => {
-    setIsDrawing(false);
-  };
+    return () => {
+      window.removeEventListener('resize', setupCanvas);
+      canvas.removeEventListener('mousedown', handleStart);
+      canvas.removeEventListener('mousemove', handleMove);
+      window.removeEventListener('mouseup', handleEnd);
+      canvas.removeEventListener('touchstart', handleStart);
+      canvas.removeEventListener('touchmove', handleMove);
+      canvas.removeEventListener('touchend', handleEnd);
+    };
+  }, []);
 
   const clearCanvas = () => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
     if (!canvas || !ctx) return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const rect = canvas.getBoundingClientRect();
+    ctx.clearRect(0, 0, rect.width, rect.height);
     setHasDrawn(false);
   };
 
   return (
     <div className="flex flex-col space-y-3 w-full">
       <div className="relative group">
-        <div className="absolute -inset-1 bg-gradient-to-r from-slate-200 to-slate-100 rounded-[2rem] blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+        <div className="absolute -inset-1 bg-gradient-to-r from-slate-200 to-slate-100 rounded-[2rem] blur opacity-25"></div>
         <div className="relative bg-white border-2 border-slate-100 rounded-[1.8rem] overflow-hidden shadow-inner h-40 cursor-crosshair">
           <canvas
             ref={canvasRef}
-            onMouseDown={startDrawing}
-            onMouseMove={draw}
-            onMouseUp={stopDrawing}
-            onMouseLeave={stopDrawing}
-            onTouchStart={startDrawing}
-            onTouchMove={draw}
-            onTouchEnd={stopDrawing}
             className="w-full h-full touch-none"
             style={{ touchAction: 'none' }}
           />
           {!hasDrawn && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none opacity-20">
-              <i className="fas fa-signature text-4xl mb-2 text-slate-400"></i>
-              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-500">Dibuje su firma aquí</p>
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none opacity-20 px-6 text-center">
+              <i className="fas fa-signature text-3xl mb-2 text-slate-400"></i>
+              <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-500">Realice su trazo digital aquí</p>
             </div>
           )}
           <button
             type="button"
             onClick={clearCanvas}
-            className="absolute bottom-4 right-4 bg-slate-100 hover:bg-slate-200 text-slate-500 p-2 rounded-full transition-colors z-20"
+            className="absolute bottom-4 right-4 bg-slate-100/80 backdrop-blur hover:bg-slate-200 text-slate-500 w-8 h-8 rounded-full flex items-center justify-center transition-all z-20 shadow-sm"
             title="Borrar firma"
           >
             <i className="fas fa-redo-alt text-[10px]"></i>
