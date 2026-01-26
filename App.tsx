@@ -602,7 +602,7 @@ const App: React.FC = () => {
         </div>
       </div>
       <div className="mt-10 mb-20 text-center">
-        <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.6em]">© 2026 CAISHEN CAPITAL GROUP S.A.S. | OFICIALÍA DE CUMPLIMIENTO REGIONAL</p>
+        <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.6em]">© 2026 CAISHEN CAPITAL GROUP S.A.S. | OFICIALÍA DE CUMPLIMIENTO</p>
       </div>
     </div>
   );
