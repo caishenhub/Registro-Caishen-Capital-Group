@@ -135,15 +135,37 @@ const SignaturePad: React.FC = () => {
     ctx.lineJoin = 'round';
   }, []);
 
+  const getCoordinates = (e: React.MouseEvent | React.TouchEvent) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
+    const rect = canvas.getBoundingClientRect();
+    
+    let clientX, clientY;
+    if ('touches' in e && e.touches.length > 0) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else {
+      const mouseEvent = e as React.MouseEvent;
+      clientX = mouseEvent.clientX;
+      clientY = mouseEvent.clientY;
+    }
+
+    return {
+      x: clientX - rect.left,
+      y: clientY - rect.top
+    };
+  };
+
   const startDrawing = (e: React.MouseEvent | React.TouchEvent) => {
+    // Evitar scroll en móvil mientras se firma
+    if (e.cancelable) e.preventDefault();
+    
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const rect = canvas.getBoundingClientRect();
-    const x = ('touches' in e ? e.touches[0].clientX : e.clientX) - rect.left;
-    const y = ('touches' in e ? e.touches[0].clientY : e.clientY) - rect.top;
+    const { x, y } = getCoordinates(e);
 
     ctx.beginPath();
     ctx.moveTo(x, y);
@@ -153,19 +175,22 @@ const SignaturePad: React.FC = () => {
 
   const draw = (e: React.MouseEvent | React.TouchEvent) => {
     if (!isDrawing) return;
+    // Evitar scroll en móvil mientras se firma
+    if (e.cancelable) e.preventDefault();
+
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
     if (!canvas || !ctx) return;
 
-    const rect = canvas.getBoundingClientRect();
-    const x = ('touches' in e ? e.touches[0].clientX : e.clientX) - rect.left;
-    const y = ('touches' in e ? e.touches[0].clientY : e.clientY) - rect.top;
+    const { x, y } = getCoordinates(e);
 
     ctx.lineTo(x, y);
     ctx.stroke();
   };
 
-  const stopDrawing = () => setIsDrawing(false);
+  const stopDrawing = (e: React.MouseEvent | React.TouchEvent) => {
+    setIsDrawing(false);
+  };
 
   const clearCanvas = () => {
     const canvas = canvasRef.current;
@@ -190,6 +215,7 @@ const SignaturePad: React.FC = () => {
             onTouchMove={draw}
             onTouchEnd={stopDrawing}
             className="w-full h-full touch-none"
+            style={{ touchAction: 'none' }}
           />
           {!hasDrawn && (
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none opacity-20">
@@ -200,7 +226,7 @@ const SignaturePad: React.FC = () => {
           <button
             type="button"
             onClick={clearCanvas}
-            className="absolute bottom-4 right-4 bg-slate-100 hover:bg-slate-200 text-slate-500 p-2 rounded-full transition-colors"
+            className="absolute bottom-4 right-4 bg-slate-100 hover:bg-slate-200 text-slate-500 p-2 rounded-full transition-colors z-20"
             title="Borrar firma"
           >
             <i className="fas fa-redo-alt text-[10px]"></i>
