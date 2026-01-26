@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from 'react';
 
 /**
- * CAISHEN CAPITAL GROUP - ONBOARDING INSTITUCIONAL v3.7
- * Ajustes de etiquetas y opcionalidad de campos.
+ * CAISHEN CAPITAL GROUP - ONBOARDING INSTITUCIONAL v3.9
+ * Restauración de mensaje funcional y mantenimiento de estética premium.
  */
 
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx9eYMH85av1PTxYuFgJOPvdVeu11aMelYXgxw7VIANAfYFobZqGuIV0xeAdUa3VXACMQ/exec';
@@ -226,32 +226,40 @@ const App: React.FC = () => {
 
   if (showIntro) {
     return (
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#f1f5f9]/90 backdrop-blur-sm animate-fade-in">
-        <div className="max-w-[720px] w-full bg-white rounded-[3rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] border border-slate-100 overflow-hidden">
-          <div className="p-10 md:p-16 text-center">
-            <div className="mb-14 flex justify-center">
-              <img src={LOGO_URL} alt="Caishen Capital Group" className="h-16 md:h-20 object-contain" />
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#f1f5f9]/95 backdrop-blur-md animate-fade-in">
+        <div className="max-w-[720px] w-full bg-white rounded-[3.5rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.15)] border border-slate-100 overflow-hidden">
+          <div className="p-10 md:p-20 text-center">
+            <div className="mb-16 flex justify-center animate-bounce-slow">
+              <img src={LOGO_URL} alt="Caishen Capital Group" className="h-16 md:h-24 object-contain" />
             </div>
-            <h1 className="text-[28px] md:text-[34px] font-extrabold text-[#1d1c2d] leading-tight mb-8 px-4 tracking-tighter uppercase">
-              BIENVENIDO A CAISHEN CAPITAL GROUP
+            
+            <h1 className="text-[28px] md:text-[38px] font-black text-[#1d1c2d] leading-tight mb-10 px-4 tracking-tighter uppercase">
+              BIENVENIDO A<br/> 
+              <span className="whitespace-nowrap text-[#1d1c2d]">CAISHEN CAPITAL GROUP</span>
             </h1>
-            <div className="space-y-6 mb-14 px-4 md:px-12">
-              <p className="text-[#64748b] text-[14px] md:text-[16px] leading-relaxed font-medium">
+            
+            <div className="space-y-8 mb-16 px-4 md:px-10">
+              <p className="text-[#64748b] text-[15px] md:text-[17px] leading-relaxed font-semibold">
                 Está a punto de iniciar el pre-registro de accionistas, un proceso informativo y de verificación inicial que nos permite conocer su perfil antes de cualquier vinculación formal.
               </p>
+              <p className="text-[#94a3b8] text-[12px] md:text-[14px] leading-relaxed font-medium uppercase tracking-wide">
+                Verificación de identidad y perfil de inversionista en tiempo real.
+              </p>
             </div>
-            <div className="px-4 md:px-20 mb-10">
+
+            <div className="px-4 md:px-14 mb-12">
               <button 
                 onClick={() => setShowIntro(false)}
-                className="w-full bg-[#ceff04] text-[#1d1c2d] py-6 rounded-2xl font-black uppercase tracking-[0.2em] text-[13px] shadow-[0_12px_35px_-5px_rgba(206,255,4,0.5)] transition-all active:scale-[0.97]"
+                className="w-full bg-[#ceff04] text-[#1d1c2d] py-7 rounded-3xl font-black uppercase tracking-[0.4em] text-[13px] shadow-[0_15px_45px_-10px_rgba(206,255,4,0.6)] transition-all hover:shadow-[0_20px_50px_-10px_rgba(206,255,4,0.8)] hover:-translate-y-1 active:scale-[0.96]"
               >
-                INICIAR PRE-REGISTRO
+                ACCEDER AL PROTOCOLO
               </button>
             </div>
-            <div className="flex justify-center items-center space-x-6 md:space-x-10 mb-10 text-[9px] font-bold text-[#94a3b8] uppercase tracking-wider">
-              <span><i className="fas fa-shield-alt mr-2 text-[#1d1c2d]"></i> SEGURO</span>
-              <span><i className="fas fa-lock mr-2 text-[#1d1c2d]"></i> ENCRIPTADO</span>
-              <span><i className="fas fa-user-check mr-2 text-[#1d1c2d]"></i> VERIFICADO</span>
+
+            <div className="flex justify-center items-center space-x-8 md:space-x-12 mb-4 text-[10px] font-black text-[#1d1c2d] uppercase tracking-widest opacity-80">
+              <span className="flex items-center"><i className="fas fa-shield-halved mr-2"></i> SECURITY+</span>
+              <span className="flex items-center"><i className="fas fa-fingerprint mr-2"></i> BIOMETRIC</span>
+              <span className="flex items-center"><i className="fas fa-link mr-2"></i> BLOCKCHAIN-SYNC</span>
             </div>
           </div>
         </div>
