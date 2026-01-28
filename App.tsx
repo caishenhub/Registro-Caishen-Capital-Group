@@ -2,8 +2,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 /**
- * CAISHEN CAPITAL GROUP - ONBOARDING INSTITUCIONAL v4.5
- * Refinamiento de UX en sección de firma: Guía asistida de trazo manuscrito.
+ * CAISHEN CAPITAL GROUP - ONBOARDING INSTITUCIONAL v4.6
+ * Optimización de responsividad en botón de éxito y refinamiento de UX en firma.
  */
 
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx9eYMH85av1PTxYuFgJOPvdVeu11aMelYXgxw7VIANAfYFobZqGuIV0xeAdUa3VXACMQ/exec';
@@ -235,7 +235,7 @@ const SignaturePad: React.FC = () => {
         </div>
       </div>
       
-      {/* Nueva guía visual instructiva */}
+      {/* Guía visual instructiva con ícono de información */}
       <div className="flex items-center justify-center space-x-2 bg-slate-50 py-2 px-4 rounded-full border border-slate-100 w-fit mx-auto transition-all hover:bg-slate-100/80 group">
         <i className="fas fa-info-circle text-slate-400 text-[10px] group-hover:text-slate-600"></i>
         <p className="text-[8px] font-black text-slate-500 uppercase tracking-[0.15em]">
@@ -403,48 +403,49 @@ const App: React.FC = () => {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
-        <div className="max-w-[500px] w-full bg-white rounded-[3rem] shadow-2xl p-10 md:p-16 text-center animate-fade-in border-b-[12px] border-[#1d1c2d]">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 md:p-6">
+        <div className="max-w-[500px] w-full bg-white rounded-[3rem] shadow-2xl p-8 md:p-16 text-center animate-fade-in border-b-[12px] border-[#1d1c2d]">
           {/* Círculo Verde con Chulito */}
-          <div className="w-24 h-24 bg-[#ceff04] rounded-full flex items-center justify-center mx-auto mb-10 shadow-[0_10px_40px_rgba(206,255,4,0.5)] relative">
+          <div className="w-20 md:w-24 h-20 md:h-24 bg-[#ceff04] rounded-full flex items-center justify-center mx-auto mb-8 md:mb-10 shadow-[0_10px_40px_rgba(206,255,4,0.5)] relative">
             <div className="absolute inset-0 bg-[#ceff04] rounded-full animate-ping opacity-20"></div>
-            <i className="fas fa-check text-[#1d1c2d] text-4xl"></i>
+            <i className="fas fa-check text-[#1d1c2d] text-3xl md:text-4xl"></i>
           </div>
           
-          <h2 className="text-3xl font-black text-slate-900 mb-6 uppercase tracking-tight">Pre-Registro Exitoso</h2>
+          <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-6 uppercase tracking-tight">Pre-Registro Exitoso</h2>
           
-          <div className="bg-slate-50/80 p-6 rounded-[2rem] mb-10 border border-slate-100 shadow-inner">
-            <p className="text-[10px] text-slate-400 font-bold uppercase mb-2 tracking-[0.2em]">Folio de reserva asignado</p>
-            <p className="text-2xl font-black text-slate-800 font-mono tracking-tighter">{formData.codigo_registro}</p>
+          <div className="bg-slate-50/80 p-5 md:p-6 rounded-[2rem] mb-8 md:mb-10 border border-slate-100 shadow-inner">
+            <p className="text-[9px] md:text-[10px] text-slate-400 font-bold uppercase mb-2 tracking-[0.2em]">Folio de reserva asignado</p>
+            <p className="text-xl md:text-2xl font-black text-slate-800 font-mono tracking-tighter">{formData.codigo_registro}</p>
           </div>
 
-          <div className="space-y-6 mb-12">
-            <p className="text-slate-500 text-[13px] leading-relaxed font-semibold px-4">
+          <div className="space-y-6 mb-10 md:mb-12">
+            <p className="text-slate-500 text-[12px] md:text-[13px] leading-relaxed font-semibold px-2 md:px-4">
               Su información ha sido encriptada y cargada a nuestro sistema de cumplimiento. Para finalizar el proceso de blindaje institucional, debe completar la validación biométrica obligatoria.
             </p>
           </div>
 
-          <div className="flex flex-col space-y-5">
+          <div className="flex flex-col space-y-4 md:space-y-5">
             <a 
               href={KYC_EXTERNAL_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full py-6 bg-[#ceff04] text-[#1d1c2d] rounded-[2rem] font-black uppercase tracking-[0.2em] text-[13px] shadow-[0_20px_50px_-10px_rgba(206,255,4,0.6)] transition-all hover:shadow-[0_25px_60px_-10px_rgba(206,255,4,0.8)] hover:-translate-y-1 active:scale-[0.98] flex items-center justify-center"
+              className="w-full py-5 md:py-6 px-4 md:px-6 bg-[#ceff04] text-[#1d1c2d] rounded-[2rem] font-black uppercase tracking-wider md:tracking-[0.2em] text-[11px] md:text-[13px] shadow-[0_20px_50px_-10px_rgba(206,255,4,0.6)] transition-all hover:shadow-[0_25px_60px_-10px_rgba(206,255,4,0.8)] hover:-translate-y-1 active:scale-[0.98] flex items-center justify-center space-x-3 overflow-hidden"
             >
-              <i className="fas fa-fingerprint mr-3 text-xl"></i> Iniciar Validación Biométrica
+              <i className="fas fa-fingerprint text-lg md:text-xl shrink-0"></i> 
+              <span className="text-center leading-tight">Iniciar Validación Biométrica</span>
             </a>
             
             <button 
               onClick={resetApp} 
-              className="w-full py-4 text-slate-400 hover:text-slate-600 font-bold uppercase tracking-widest text-[10px] transition-colors"
+              className="w-full py-4 text-slate-400 hover:text-slate-600 font-bold uppercase tracking-widest text-[9px] md:text-[10px] transition-colors"
             >
               Realizar otro registro
             </button>
           </div>
           
-          <div className="mt-16 flex justify-center items-center space-x-3 opacity-30">
+          <div className="mt-12 md:mt-16 flex justify-center items-center space-x-3 opacity-30">
             <i className="fas fa-lock text-[10px]"></i>
-            <span className="text-[9px] font-black uppercase tracking-[0.3em]">End-to-End Encrypted</span>
+            <span className="text-[8px] md:text-[9px] font-black uppercase tracking-[0.3em]">End-to-End Encrypted</span>
           </div>
         </div>
       </div>
