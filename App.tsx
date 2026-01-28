@@ -2,12 +2,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 /**
- * CAISHEN CAPITAL GROUP - ONBOARDING INSTITUCIONAL v4.2
- * Corrección de correlación de coordenadas y escala en Signature Pad.
+ * CAISHEN CAPITAL GROUP - ONBOARDING INSTITUCIONAL v4.5
+ * Refinamiento de UX en sección de firma: Guía asistida de trazo manuscrito.
  */
 
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx9eYMH85av1PTxYuFgJOPvdVeu11aMelYXgxw7VIANAfYFobZqGuIV0xeAdUa3VXACMQ/exec';
 const LOGO_URL = 'https://i.ibb.co/zT3RhhT9/CAISHEN-NO-FONDO-AZUL-1.png';
+const KYC_EXTERNAL_URL = 'https://caishen-capital-group-kyc.vercel.app/';
 
 const generateUniqueCode = () => {
   const prefix = 'CCG';
@@ -127,14 +128,10 @@ const SignaturePad: React.FC = () => {
       const rect = canvas.getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
       
-      // Ajustar dimensiones internas del canvas
       canvas.width = rect.width * dpr;
       canvas.height = rect.height * dpr;
-      
-      // Escalar el contexto para que 1 unidad de dibujo = 1 pixel CSS
       ctx.scale(dpr, dpr);
       
-      // Restablecer estilos después del cambio de tamaño
       ctx.strokeStyle = '#1d1c2d';
       ctx.lineWidth = 2;
       ctx.lineCap = 'round';
@@ -212,7 +209,7 @@ const SignaturePad: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col space-y-3 w-full">
+    <div className="flex flex-col space-y-4 w-full">
       <div className="relative group">
         <div className="absolute -inset-1 bg-gradient-to-r from-slate-200 to-slate-100 rounded-[2rem] blur opacity-25"></div>
         <div className="relative bg-white border-2 border-slate-100 rounded-[1.8rem] overflow-hidden shadow-inner h-40 cursor-crosshair">
@@ -237,9 +234,14 @@ const SignaturePad: React.FC = () => {
           </button>
         </div>
       </div>
-      <p className="text-[7px] font-bold text-slate-400 uppercase tracking-widest text-center">
-        <i className="fas fa-info-circle mr-1"></i> El trazo manuscrito es para validación de experiencia de usuario.
-      </p>
+      
+      {/* Nueva guía visual instructiva */}
+      <div className="flex items-center justify-center space-x-2 bg-slate-50 py-2 px-4 rounded-full border border-slate-100 w-fit mx-auto transition-all hover:bg-slate-100/80 group">
+        <i className="fas fa-info-circle text-slate-400 text-[10px] group-hover:text-slate-600"></i>
+        <p className="text-[8px] font-black text-slate-500 uppercase tracking-[0.15em]">
+          Utilice su dedo o puntero para realizar su trazo manuscrito legal
+        </p>
+      </div>
     </div>
   );
 };
@@ -402,17 +404,48 @@ const App: React.FC = () => {
   if (submitted) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
-        <div className="max-w-md w-full bg-white rounded-3xl shadow-xl p-12 text-center animate-fade-in border-b-8 border-[#1d1c2d]">
-          <div className="w-16 h-16 bg-[#ceff04] rounded-full flex items-center justify-center mx-auto mb-8">
-            <i className="fas fa-check text-[#1d1c2d] text-xl"></i>
+        <div className="max-w-[500px] w-full bg-white rounded-[3rem] shadow-2xl p-10 md:p-16 text-center animate-fade-in border-b-[12px] border-[#1d1c2d]">
+          {/* Círculo Verde con Chulito */}
+          <div className="w-24 h-24 bg-[#ceff04] rounded-full flex items-center justify-center mx-auto mb-10 shadow-[0_10px_40px_rgba(206,255,4,0.5)] relative">
+            <div className="absolute inset-0 bg-[#ceff04] rounded-full animate-ping opacity-20"></div>
+            <i className="fas fa-check text-[#1d1c2d] text-4xl"></i>
           </div>
-          <h2 className="text-xl font-black text-slate-900 mb-2 uppercase tracking-tight">Registro Procesado</h2>
-          <p className="text-slate-500 text-[11px] mb-8 font-mono">Su información ha sido encriptada y enviada a revisión.</p>
-          <div className="bg-slate-50 p-4 rounded-xl mb-8 border border-slate-100">
-            <p className="text-[8px] text-slate-400 font-bold uppercase mb-1 tracking-widest">FOLIO ASIGNADO</p>
-            <p className="text-lg font-black text-slate-800 font-mono tracking-tighter">{formData.codigo_registro}</p>
+          
+          <h2 className="text-3xl font-black text-slate-900 mb-6 uppercase tracking-tight">Pre-Registro Exitoso</h2>
+          
+          <div className="bg-slate-50/80 p-6 rounded-[2rem] mb-10 border border-slate-100 shadow-inner">
+            <p className="text-[10px] text-slate-400 font-bold uppercase mb-2 tracking-[0.2em]">Folio de reserva asignado</p>
+            <p className="text-2xl font-black text-slate-800 font-mono tracking-tighter">{formData.codigo_registro}</p>
           </div>
-          <button onClick={resetApp} className="w-full py-4 bg-[#1d1c2d] text-white rounded-xl font-bold uppercase tracking-widest text-[10px]">Nuevo Registro</button>
+
+          <div className="space-y-6 mb-12">
+            <p className="text-slate-500 text-[13px] leading-relaxed font-semibold px-4">
+              Su información ha sido encriptada y cargada a nuestro sistema de cumplimiento. Para finalizar el proceso de blindaje institucional, debe completar la validación biométrica obligatoria.
+            </p>
+          </div>
+
+          <div className="flex flex-col space-y-5">
+            <a 
+              href={KYC_EXTERNAL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-6 bg-[#ceff04] text-[#1d1c2d] rounded-[2rem] font-black uppercase tracking-[0.2em] text-[13px] shadow-[0_20px_50px_-10px_rgba(206,255,4,0.6)] transition-all hover:shadow-[0_25px_60px_-10px_rgba(206,255,4,0.8)] hover:-translate-y-1 active:scale-[0.98] flex items-center justify-center"
+            >
+              <i className="fas fa-fingerprint mr-3 text-xl"></i> Iniciar Validación Biométrica
+            </a>
+            
+            <button 
+              onClick={resetApp} 
+              className="w-full py-4 text-slate-400 hover:text-slate-600 font-bold uppercase tracking-widest text-[10px] transition-colors"
+            >
+              Realizar otro registro
+            </button>
+          </div>
+          
+          <div className="mt-16 flex justify-center items-center space-x-3 opacity-30">
+            <i className="fas fa-lock text-[10px]"></i>
+            <span className="text-[9px] font-black uppercase tracking-[0.3em]">End-to-End Encrypted</span>
+          </div>
         </div>
       </div>
     );
@@ -533,7 +566,7 @@ const App: React.FC = () => {
                 </div>
                 
                 <h3 className="text-white text-[16px] font-black uppercase mb-4 tracking-tight">Escrutinio de Seguridad Internacional</h3>
-                <p className="text-slate-400 text-[10px] leading-relaxed mb-8 pr-10 font-medium">
+                <p className="text-slate-400 text-[10px] leading-relaxed mb-6 pr-10 font-medium">
                   Al proceder, usted autoriza a Caishen Capital Group S.A.S. a realizar el cruce automático de su identidad con listas restrictivas internacionales, incluyendo <span className="text-white font-bold">OFAC (Lista Clinton), ONU, Interpol, Europol</span> y sistemas de alertas tempranas SARLAFT/PADM.
                 </p>
 
@@ -546,6 +579,10 @@ const App: React.FC = () => {
                   onChange={handleInputChange}
                   dark
                 />
+                
+                <p className="text-[#ceff04]/60 text-[8px] font-black uppercase tracking-[0.2em] mt-4 flex items-center">
+                   <i className="fas fa-arrow-right mr-2"></i> El enlace de validación se habilitará al finalizar este formulario.
+                </p>
               </div>
             </div>
 
