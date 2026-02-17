@@ -2,8 +2,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 /**
- * CAISHEN CAPITAL GROUP - ONBOARDING INSTITUCIONAL v4.8
- * Update: Sincronización con nuevo endpoint de Google Apps Script.
+ * CAISHEN CAPITAL GROUP - ONBOARDING INSTITUCIONAL v5.0
+ * Fix: Reajuste de dimensiones de la pantalla de inicio (intro) para evitar cortes de texto.
+ * Optimización de responsividad para pantallas pequeñas y medianas.
  */
 
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyFP3dmWdL40bNa8LKX1jBC4oQXEwidBMCXQDRiD0Ul0exMiul_Ppf2dt-RArS4BaIWQw/exec';
@@ -360,39 +361,39 @@ const App: React.FC = () => {
   if (showIntro) {
     return (
       <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#f1f5f9]/95 backdrop-blur-md animate-fade-in">
-        <div className="max-w-[720px] w-full bg-white rounded-[3.5rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.15)] border border-slate-100 overflow-hidden">
-          <div className="p-10 md:p-20 text-center">
-            <div className="mb-16 flex justify-center animate-bounce-slow">
-              <img src={LOGO_URL} alt="Caishen Capital Group" className="h-16 md:h-24 object-contain" />
+        <div className="max-w-[720px] w-full max-h-[95vh] bg-white rounded-[2.5rem] md:rounded-[3.5rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.15)] border border-slate-100 overflow-y-auto">
+          <div className="p-6 md:p-16 lg:p-20 text-center">
+            <div className="mb-10 md:mb-16 flex justify-center animate-bounce-slow">
+              <img src={LOGO_URL} alt="Caishen Capital Group" className="h-12 md:h-24 object-contain" />
             </div>
             
-            <h1 className="text-[28px] md:text-[38px] font-black text-[#1d1c2d] leading-tight mb-10 px-4 tracking-tighter uppercase">
+            <h1 className="text-[22px] md:text-[38px] font-black text-[#1d1c2d] leading-tight mb-8 md:mb-10 px-2 tracking-tight md:tracking-tighter uppercase">
               BIENVENIDO A<br/> 
-              <span className="whitespace-nowrap text-[#1d1c2d]">CAISHEN CAPITAL GROUP</span>
+              <span className="text-[#1d1c2d]">CAISHEN CAPITAL GROUP</span>
             </h1>
             
-            <div className="space-y-8 mb-16 px-4 md:px-10">
-              <p className="text-[#64748b] text-[15px] md:text-[17px] leading-relaxed font-semibold">
+            <div className="space-y-6 md:space-y-8 mb-10 md:mb-16 px-2 md:px-10">
+              <p className="text-[#64748b] text-[13px] md:text-[17px] leading-relaxed font-semibold">
                 Está a punto de iniciar el pre-registro de accionistas, un proceso informativo y de verificación inicial que nos permite conocer su perfil antes de cualquier vinculación formal.
               </p>
-              <p className="text-[#94a3b8] text-[12px] md:text-[14px] leading-relaxed font-medium uppercase tracking-wide">
+              <p className="text-[#94a3b8] text-[11px] md:text-[14px] leading-relaxed font-medium uppercase tracking-wide">
                 Verificación de identidad y perfil de inversionista en tiempo real.
               </p>
             </div>
 
-            <div className="px-4 md:px-14 mb-12">
+            <div className="px-2 md:px-14 mb-10 md:mb-12">
               <button 
                 onClick={() => setShowIntro(false)}
-                className="w-full bg-[#ceff04] text-[#1d1c2d] py-7 rounded-3xl font-black uppercase tracking-[0.4em] text-[13px] shadow-[0_15px_45px_-10px_rgba(206,255,4,0.6)] transition-all hover:shadow-[0_20px_50px_-10px_rgba(206,255,4,0.8)] hover:-translate-y-1 active:scale-[0.96]"
+                className="w-full bg-[#ceff04] text-[#1d1c2d] py-5 md:py-7 rounded-2xl md:rounded-3xl font-black uppercase tracking-[0.2em] md:tracking-[0.4em] text-[11px] md:text-[13px] shadow-[0_15px_45px_-10px_rgba(206,255,4,0.6)] transition-all hover:shadow-[0_20px_50px_-10px_rgba(206,255,4,0.8)] hover:-translate-y-1 active:scale-[0.96]"
               >
                 ACCEDER AL PROTOCOLO
               </button>
             </div>
 
-            <div className="flex justify-center items-center space-x-8 md:space-x-12 mb-4 text-[10px] font-black text-[#1d1c2d] uppercase tracking-widest opacity-80">
-              <span className="flex items-center"><i className="fas fa-shield-halved mr-2"></i> SECURITY+</span>
-              <span className="flex items-center"><i className="fas fa-fingerprint mr-2"></i> BIOMETRIC</span>
-              <span className="flex items-center"><i className="fas fa-link mr-2"></i> BLOCKCHAIN-SYNC</span>
+            <div className="flex flex-wrap justify-center items-center gap-4 md:gap-12 mb-2 text-[9px] md:text-[10px] font-black text-[#1d1c2d] uppercase tracking-widest opacity-80">
+              <span className="flex items-center"><i className="fas fa-shield-halved mr-1.5 md:mr-2 text-[#ceff04]/60"></i> SECURITY+</span>
+              <span className="flex items-center"><i className="fas fa-fingerprint mr-1.5 md:mr-2 text-[#ceff04]/60"></i> BIOMETRIC</span>
+              <span className="flex items-center"><i className="fas fa-link mr-1.5 md:mr-2 text-[#ceff04]/60"></i> BLOCKCHAIN-SYNC</span>
             </div>
           </div>
         </div>
