@@ -2,11 +2,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 /**
- * CAISHEN CAPITAL GROUP - ONBOARDING INSTITUCIONAL v4.6
- * Optimización de responsividad en botón de éxito y refinamiento de UX en firma.
+ * CAISHEN CAPITAL GROUP - ONBOARDING INSTITUCIONAL v4.8
+ * Update: Sincronización con nuevo endpoint de Google Apps Script.
  */
 
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx9eYMH85av1PTxYuFgJOPvdVeu11aMelYXgxw7VIANAfYFobZqGuIV0xeAdUa3VXACMQ/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyFP3dmWdL40bNa8LKX1jBC4oQXEwidBMCXQDRiD0Ul0exMiul_Ppf2dt-RArS4BaIWQw/exec';
 const LOGO_URL = 'https://i.ibb.co/zT3RhhT9/CAISHEN-NO-FONDO-AZUL-1.png';
 const KYC_EXTERNAL_URL = 'https://caishen-capital-group-kyc.vercel.app/';
 
@@ -235,7 +235,6 @@ const SignaturePad: React.FC = () => {
         </div>
       </div>
       
-      {/* Guía visual instructiva con ícono de información */}
       <div className="flex items-center justify-center space-x-2 bg-slate-50 py-2 px-4 rounded-full border border-slate-100 w-fit mx-auto transition-all hover:bg-slate-100/80 group">
         <i className="fas fa-info-circle text-slate-400 text-[10px] group-hover:text-slate-600"></i>
         <p className="text-[8px] font-black text-slate-500 uppercase tracking-[0.15em]">
@@ -429,7 +428,7 @@ const App: React.FC = () => {
               href={KYC_EXTERNAL_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full py-5 md:py-6 px-4 md:px-6 bg-[#ceff04] text-[#1d1c2d] rounded-[2rem] font-black uppercase tracking-wider md:tracking-[0.2em] text-[11px] md:text-[13px] shadow-[0_20px_50px_-10px_rgba(206,255,4,0.6)] transition-all hover:shadow-[0_25px_60px_-10px_rgba(206,255,4,0.8)] hover:-translate-y-1 active:scale-[0.98] flex items-center justify-center space-x-3 overflow-hidden"
+              className="w-full py-5 md:py-6 px-2 md:px-6 bg-[#ceff04] text-[#1d1c2d] rounded-[2rem] font-black uppercase tracking-tight md:tracking-[0.2em] text-[11px] md:text-[13px] shadow-[0_20px_50px_-10px_rgba(206,255,4,0.6)] transition-all hover:shadow-[0_25px_60px_-10px_rgba(206,255,4,0.8)] hover:-translate-y-1 active:scale-[0.98] flex items-center justify-center space-x-2 shrink-0"
             >
               <i className="fas fa-fingerprint text-lg md:text-xl shrink-0"></i> 
               <span className="text-center leading-tight">Iniciar Validación Biométrica</span>
