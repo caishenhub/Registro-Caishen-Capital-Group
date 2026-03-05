@@ -9,7 +9,7 @@ import React, { useState, useEffect, useRef } from 'react';
 
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyFP3dmWdL40bNa8LKX1jBC4oQXEwidBMCXQDRiD0Ul0exMiul_Ppf2dt-RArS4BaIWQw/exec';
 const LOGO_URL = 'https://i.ibb.co/zT3RhhT9/CAISHEN-NO-FONDO-AZUL-1.png';
-const KYC_EXTERNAL_URL = 'https://caishen-capital-group-kyc.vercel.app/';
+const KYC_EXTERNAL_URL = 'https://compliance.caishencapitalgroup.com/';
 
 const generateUniqueCode = () => {
   const prefix = 'CCG';
@@ -119,28 +119,42 @@ const SignaturePad: React.FC = () => {
   const [hasDrawn, setHasDrawn] = useState(false);
   const isDrawing = useRef(false);
 
-  useEffect(() => {
+  const setupCanvas = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return;
+
+    const dpr = window.devicePixelRatio || 1;
+    
+    // Set internal resolution
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const setupCanvas = () => {
-      const rect = canvas.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
-      
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
-      ctx.scale(dpr, dpr);
-      
-      ctx.strokeStyle = '#1d1c2d';
-      ctx.lineWidth = 2;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-    };
+    // Reset transform and apply scale
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(dpr, dpr);
+    
+    ctx.strokeStyle = '#1d1c2d';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+  };
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
     setupCanvas();
-    window.addEventListener('resize', setupCanvas);
+
+    const resizeObserver = new ResizeObserver(() => {
+      // Note: resizing clears canvas. For a signature this is usually acceptable.
+      setupCanvas();
+    });
+    resizeObserver.observe(canvas);
 
     const getPos = (e: MouseEvent | TouchEvent) => {
       const rect = canvas.getBoundingClientRect();
@@ -162,6 +176,9 @@ const SignaturePad: React.FC = () => {
 
     const handleStart = (e: MouseEvent | TouchEvent) => {
       if (e.cancelable) e.preventDefault();
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
       isDrawing.current = true;
       setHasDrawn(true);
       const { x, y } = getPos(e);
@@ -172,6 +189,9 @@ const SignaturePad: React.FC = () => {
     const handleMove = (e: MouseEvent | TouchEvent) => {
       if (!isDrawing.current) return;
       if (e.cancelable) e.preventDefault();
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
       const { x, y } = getPos(e);
       ctx.lineTo(x, y);
       ctx.stroke();
@@ -190,7 +210,7 @@ const SignaturePad: React.FC = () => {
     canvas.addEventListener('touchend', handleEnd);
 
     return () => {
-      window.removeEventListener('resize', setupCanvas);
+      resizeObserver.disconnect();
       canvas.removeEventListener('mousedown', handleStart);
       canvas.removeEventListener('mousemove', handleMove);
       window.removeEventListener('mouseup', handleEnd);
@@ -202,9 +222,12 @@ const SignaturePad: React.FC = () => {
 
   const clearCanvas = () => {
     const canvas = canvasRef.current;
-    const ctx = canvas?.getContext('2d');
-    if (!canvas || !ctx) return;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
     const rect = canvas.getBoundingClientRect();
+    // Clear using CSS dimensions since context is scaled
     ctx.clearRect(0, 0, rect.width, rect.height);
     setHasDrawn(false);
   };

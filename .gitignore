@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# AI Studio internal history
+migrated_prompt_history/
+prompt_*.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
