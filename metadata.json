@@ -1,5 +1,6 @@
 {
   "name": "Formulario de Registro de Inversionista Caishen Capital Group",
-  "description": "Aplicación de registro inicial para inversionistas de Caishen Capital Group S.A.S., diseñada con altos estándares de compliance financiero y UX legal colombiana.",
-  "requestFramePermissions": []
+  "description": "Aplicación de registro inicial para inversionistas de Caishen Capital Group S.A.S., diseñada con altos estándares de compliance financiero, código QR interactivo y UX legal colombiana.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

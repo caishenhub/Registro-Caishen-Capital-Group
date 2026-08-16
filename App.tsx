@@ -1,10 +1,13 @@
 
 import React, { useState, useEffect, useRef } from 'react';
+import { RegistrationQRModal } from './src/components/RegistrationQRModal';
+import { QRCodeCard } from './src/components/QRCodeCard';
 
 /**
  * CAISHEN CAPITAL GROUP - ONBOARDING INSTITUCIONAL v5.0
  * Fix: Reajuste de dimensiones de la pantalla de inicio (intro) para evitar cortes de texto.
  * Optimización de responsividad para pantallas pequeñas y medianas.
+ * Módulo de Código QR integrado para registro y validación biométrica.
  */
 
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyFP3dmWdL40bNa8LKX1jBC4oQXEwidBMCXQDRiD0Ul0exMiul_Ppf2dt-RArS4BaIWQw/exec';
@@ -275,6 +278,7 @@ const App: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [ip, setIp] = useState('0.0.0.0');
+  const [showQRModal, setShowQRModal] = useState(false);
 
   useEffect(() => {
     fetch('https://api.ipify.org?format=json')
@@ -395,7 +399,7 @@ const App: React.FC = () => {
               <span className="text-[#1d1c2d]">CAISHEN CAPITAL GROUP</span>
             </h1>
             
-            <div className="space-y-6 md:space-y-8 mb-10 md:mb-16 px-2 md:px-10">
+            <div className="space-y-6 md:space-y-8 mb-10 md:mb-14 px-2 md:px-10">
               <p className="text-[#64748b] text-[13px] md:text-[17px] leading-relaxed font-semibold">
                 Está a punto de iniciar el pre-registro de accionistas, un proceso informativo y de verificación inicial que nos permite conocer su perfil antes de cualquier vinculación formal.
               </p>
@@ -404,12 +408,25 @@ const App: React.FC = () => {
               </p>
             </div>
 
-            <div className="px-2 md:px-14 mb-10 md:mb-12">
+            <div className="px-2 md:px-10 mb-8 md:mb-10 flex flex-col sm:flex-row gap-3.5 justify-center">
               <button 
+                id="btn-access-protocol"
                 onClick={() => setShowIntro(false)}
-                className="w-full bg-[#ceff04] text-[#1d1c2d] py-5 md:py-7 rounded-2xl md:rounded-3xl font-black uppercase tracking-[0.2em] md:tracking-[0.4em] text-[11px] md:text-[13px] shadow-[0_15px_45px_-10px_rgba(206,255,4,0.6)] transition-all hover:shadow-[0_20px_50px_-10px_rgba(206,255,4,0.8)] hover:-translate-y-1 active:scale-[0.96]"
+                className="flex-1 bg-[#ceff04] text-[#1d1c2d] py-5 md:py-6 rounded-2xl md:rounded-3xl font-black uppercase tracking-[0.18em] md:tracking-[0.28em] text-[11px] md:text-[13px] shadow-[0_15px_45px_-10px_rgba(206,255,4,0.6)] transition-all hover:shadow-[0_20px_50px_-10px_rgba(206,255,4,0.8)] hover:-translate-y-1 active:scale-[0.96] flex items-center justify-center space-x-2"
               >
-                ACCEDER AL PROTOCOLO
+                <span>ACCEDER AL PROTOCOLO</span>
+                <i className="fas fa-arrow-right text-xs"></i>
+              </button>
+
+              <button
+                id="btn-open-qr-intro"
+                type="button"
+                onClick={() => setShowQRModal(true)}
+                className="sm:w-auto px-6 py-5 md:py-6 bg-[#1d1c2d] hover:bg-slate-800 text-white rounded-2xl md:rounded-3xl font-black uppercase tracking-wider text-[11px] md:text-[12px] transition-all hover:-translate-y-1 active:scale-[0.96] flex items-center justify-center space-x-2 border border-slate-700 shadow-md"
+                title="Generar y escanear código QR de registro"
+              >
+                <i className="fas fa-qrcode text-[#ceff04] text-base"></i>
+                <span>CÓDIGO QR</span>
               </button>
             </div>
 
@@ -420,6 +437,14 @@ const App: React.FC = () => {
             </div>
           </div>
         </div>
+
+        <RegistrationQRModal
+          isOpen={showQRModal}
+          onClose={() => setShowQRModal(false)}
+          defaultUrl="https://registro.caishencapitalgroup.com/"
+          title="Código QR de Registro"
+          subtitle="Escanee con su smartphone para diligenciar el pre-registro de inversionistas"
+        />
       </div>
     );
   }
@@ -427,50 +452,79 @@ const App: React.FC = () => {
   if (submitted) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 md:p-6">
-        <div className="max-w-[500px] w-full bg-white rounded-[3rem] shadow-2xl p-8 md:p-16 text-center animate-fade-in border-b-[12px] border-[#1d1c2d]">
+        <div className="max-w-[540px] w-full bg-white rounded-[3rem] shadow-2xl p-6 md:p-12 text-center animate-fade-in border-b-[12px] border-[#1d1c2d]">
           {/* Círculo Verde con Chulito */}
-          <div className="w-20 md:w-24 h-20 md:h-24 bg-[#ceff04] rounded-full flex items-center justify-center mx-auto mb-8 md:mb-10 shadow-[0_10px_40px_rgba(206,255,4,0.5)] relative">
+          <div className="w-16 md:w-20 h-16 md:h-20 bg-[#ceff04] rounded-full flex items-center justify-center mx-auto mb-6 md:mb-8 shadow-[0_10px_40px_rgba(206,255,4,0.5)] relative">
             <div className="absolute inset-0 bg-[#ceff04] rounded-full animate-ping opacity-20"></div>
-            <i className="fas fa-check text-[#1d1c2d] text-3xl md:text-4xl"></i>
+            <i className="fas fa-check text-[#1d1c2d] text-2xl md:text-3xl"></i>
           </div>
           
-          <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-6 uppercase tracking-tight">Pre-Registro Exitoso</h2>
+          <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-4 uppercase tracking-tight">Pre-Registro Exitoso</h2>
           
-          <div className="bg-slate-50/80 p-5 md:p-6 rounded-[2rem] mb-8 md:mb-10 border border-slate-100 shadow-inner">
-            <p className="text-[9px] md:text-[10px] text-slate-400 font-bold uppercase mb-2 tracking-[0.2em]">Folio de reserva asignado</p>
+          <div className="bg-slate-50/80 p-4 md:p-5 rounded-[2rem] mb-6 border border-slate-100 shadow-inner">
+            <p className="text-[9px] md:text-[10px] text-slate-400 font-bold uppercase mb-1 tracking-[0.2em]">Folio de reserva asignado</p>
             <p className="text-xl md:text-2xl font-black text-slate-800 font-mono tracking-tighter">{formData.codigo_registro}</p>
           </div>
 
-          <div className="space-y-6 mb-10 md:mb-12">
-            <p className="text-slate-500 text-[12px] md:text-[13px] leading-relaxed font-semibold px-2 md:px-4">
+          <div className="space-y-4 mb-6">
+            <p className="text-slate-500 text-[11px] md:text-[12px] leading-relaxed font-semibold px-2 md:px-4">
               Su información ha sido encriptada y cargada a nuestro sistema de cumplimiento. Para finalizar el proceso de blindaje institucional, debe completar la validación biométrica obligatoria.
             </p>
           </div>
 
-          <div className="flex flex-col space-y-4 md:space-y-5">
+          {/* QR Code Card for Mobile Biometric Onboarding */}
+          <div className="mb-6">
+            <QRCodeCard
+              url={KYC_EXTERNAL_URL}
+              folioCode={formData.codigo_registro}
+              title="Continuar Validación en Celular"
+              description="Escanee con la cámara de su smartphone para realizar la verificación biométrica y reconocimiento facial."
+              badgeLabel="CÓDIGO QR DE BIOMETRÍA"
+            />
+          </div>
+
+          <div className="flex flex-col space-y-3 md:space-y-4">
             <a 
               href={KYC_EXTERNAL_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full py-5 md:py-6 px-2 md:px-6 bg-[#ceff04] text-[#1d1c2d] rounded-[2rem] font-black uppercase tracking-tight md:tracking-[0.2em] text-[11px] md:text-[13px] shadow-[0_20px_50px_-10px_rgba(206,255,4,0.6)] transition-all hover:shadow-[0_25px_60px_-10px_rgba(206,255,4,0.8)] hover:-translate-y-1 active:scale-[0.98] flex items-center justify-center space-x-2 shrink-0"
+              className="w-full py-4 md:py-5 px-4 bg-[#ceff04] text-[#1d1c2d] rounded-[2rem] font-black uppercase tracking-tight md:tracking-[0.18em] text-[11px] md:text-[12px] shadow-[0_20px_50px_-10px_rgba(206,255,4,0.6)] transition-all hover:shadow-[0_25px_60px_-10px_rgba(206,255,4,0.8)] hover:-translate-y-1 active:scale-[0.98] flex items-center justify-center space-x-2 shrink-0"
             >
               <i className="fas fa-fingerprint text-lg md:text-xl shrink-0"></i> 
               <span className="text-center leading-tight">Iniciar Validación Biométrica</span>
             </a>
+
+            <button
+              type="button"
+              onClick={() => setShowQRModal(true)}
+              className="w-full py-3.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl font-bold uppercase tracking-wider text-[10px] transition-all flex items-center justify-center space-x-2"
+            >
+              <i className="fas fa-qrcode text-slate-500"></i>
+              <span>Compartir o Descargar Código QR</span>
+            </button>
             
             <button 
               onClick={resetApp} 
-              className="w-full py-4 text-slate-400 hover:text-slate-600 font-bold uppercase tracking-widest text-[9px] md:text-[10px] transition-colors"
+              className="w-full py-3 text-slate-400 hover:text-slate-600 font-bold uppercase tracking-widest text-[9px] md:text-[10px] transition-colors"
             >
               Realizar otro registro
             </button>
           </div>
           
-          <div className="mt-12 md:mt-16 flex justify-center items-center space-x-3 opacity-30">
+          <div className="mt-8 flex justify-center items-center space-x-3 opacity-30">
             <i className="fas fa-lock text-[10px]"></i>
             <span className="text-[8px] md:text-[9px] font-black uppercase tracking-[0.3em]">End-to-End Encrypted</span>
           </div>
         </div>
+
+        <RegistrationQRModal
+          isOpen={showQRModal}
+          onClose={() => setShowQRModal(false)}
+          defaultUrl="https://compliance.caishencapitalgroup.com/"
+          folioCode={formData.codigo_registro}
+          title="Validación Biométrica & KYC"
+          subtitle="Escanee con su móvil para completar el protocolo de validación y escaneo de identidad"
+        />
       </div>
     );
   }
@@ -478,17 +532,32 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-white md:bg-slate-50 py-0 md:py-10">
       <div className="max-w-[700px] mx-auto bg-white rounded-none md:rounded-3xl shadow-none md:shadow-2xl overflow-hidden border border-transparent md:border-slate-100 animate-fade-in">
-        <div className="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-white sticky top-0 z-50">
+        <div className="px-6 md:px-8 py-5 border-b border-slate-100 flex justify-between items-center bg-white sticky top-0 z-50">
           <div className="flex flex-col">
-            <img src={LOGO_URL} alt="Caishen Logo" className="h-10 object-contain w-max mb-1" />
+            <img src={LOGO_URL} alt="Caishen Logo" className="h-9 md:h-10 object-contain w-max mb-1" />
             <p className="text-[7px] font-black text-slate-400 uppercase tracking-[0.4em]">Protocolo Onboarding Digital</p>
           </div>
-          <div className="bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-center shadow-sm">
-             <p className="text-[7px] font-bold text-slate-400 uppercase mb-0.5">Sistemas de Información</p>
-             <div className="flex items-center space-x-1.5">
+
+          <div className="flex items-center space-x-2.5">
+            {/* QR Quick Action Button */}
+            <button
+              id="header-qr-btn"
+              type="button"
+              onClick={() => setShowQRModal(true)}
+              className="bg-[#1d1c2d] hover:bg-slate-800 text-[#ceff04] rounded-xl px-3 py-2 text-center shadow-sm transition-all hover:scale-105 active:scale-95 flex items-center space-x-1.5 cursor-pointer border border-slate-700"
+              title="Abrir o compartir Código QR para este formulario"
+            >
+              <i className="fas fa-qrcode text-xs"></i>
+              <span className="text-[8px] font-black uppercase tracking-wider hidden sm:inline">CÓDIGO QR</span>
+            </button>
+
+            <div className="bg-slate-50 border border-slate-100 rounded-xl px-3 md:px-4 py-2 text-center shadow-sm">
+              <p className="text-[7px] font-bold text-slate-400 uppercase mb-0.5">Sistemas</p>
+              <div className="flex items-center space-x-1.5">
                 <div className="w-1.5 h-1.5 bg-[#ceff04] rounded-full animate-pulse"></div>
-                <p className="text-[9px] font-black text-[#1d1c2d] uppercase tracking-tighter">KYC PROTOCOL</p>
-             </div>
+                <p className="text-[9px] font-black text-[#1d1c2d] uppercase tracking-tighter">KYC ACTIVE</p>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -662,9 +731,43 @@ const App: React.FC = () => {
           </form>
         </div>
       </div>
-      <div className="mt-10 mb-20 text-center">
-        <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.6em]">© 2026 CAISHEN CAPITAL GROUP S.A.S. | OFICIALÍA DE CUMPLIMIENTO</p>
+
+      {/* Floating QR Quick Launcher Button */}
+      <button
+        id="floating-qr-btn"
+        type="button"
+        onClick={() => setShowQRModal(true)}
+        className="fixed bottom-6 right-6 z-40 bg-[#1d1c2d] hover:bg-black text-[#ceff04] p-3.5 md:p-4 rounded-full shadow-[0_10px_30px_rgba(0,0,0,0.3)] border-2 border-[#ceff04]/40 hover:scale-110 active:scale-95 transition-all flex items-center space-x-2 group cursor-pointer"
+        title="Ver Código QR de Registro"
+      >
+        <i className="fas fa-qrcode text-lg md:text-xl"></i>
+        <span className="text-[10px] font-black uppercase tracking-wider text-white hidden md:inline group-hover:inline">
+          QR Registro
+        </span>
+      </button>
+
+      <div className="mt-10 mb-20 text-center flex flex-col items-center space-y-3">
+        <button
+          type="button"
+          onClick={() => setShowQRModal(true)}
+          className="inline-flex items-center space-x-2 text-[10px] font-black uppercase tracking-wider text-slate-500 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-xl transition-all"
+        >
+          <i className="fas fa-qrcode text-slate-700"></i>
+          <span>Generar o Imprimir Código QR</span>
+        </button>
+        <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.6em]">
+          © 2026 CAISHEN CAPITAL GROUP S.A.S. | OFICIALÍA DE CUMPLIMIENTO
+        </p>
       </div>
+
+      <RegistrationQRModal
+        isOpen={showQRModal}
+        onClose={() => setShowQRModal(false)}
+        defaultUrl="https://registro.caishencapitalgroup.com/"
+        folioCode={formData.codigo_registro}
+        title="Código QR de Registro"
+        subtitle="Escanee con la cámara de su smartphone para diligenciar el pre-registro de inversionistas"
+      />
     </div>
   );
 };
